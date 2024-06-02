@@ -3,7 +3,7 @@ IFACE="foobar"
 # Адрес основного шлюза VPN или провайдера
 GATEWAY="192.168.1.1"
 # Коды стран
-COUNTRIES="ru,by"
+COUNTRIES="ru by"
 # Расположение файла с адресами и доменами
 FILE="/opt/etc/unblock/unblock-list.txt"
 # Расположение файла с конечной таблицей

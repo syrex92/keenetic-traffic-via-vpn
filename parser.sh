@@ -48,8 +48,7 @@ trap 'exit 2' INT TERM QUIT HUP
 
 logger_msg "Удаляем файл и скачиваем новые диапазоны IP по кодам стран"
 cp $FILE $TEMPFILE
-IFS=',' read -r -a country_codes <<< "$COUNTRIES"
-for code in "${country_codes[@]}"
+for code in $COUNTRIES
 do
   logger_msg "Скачиваем диапазоны для $code"
   curl -s https://raw.githubusercontent.com/ipverse/rir-ip/master/country/$code/ipv4-aggregated.txt | grep -v '^#' >> $TEMPFILE
