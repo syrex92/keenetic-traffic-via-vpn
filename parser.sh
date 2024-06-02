@@ -1,7 +1,7 @@
 #!/bin/sh
 
 add_ip() {
-  ip route add table 1000 "$1" dev "$IFACE" 2>/dev/null
+  ip route add table 1000 "$1" via "$GATEWAY" dev "$IFACE" 2>/dev/null
 }
 
 check_ip() {
@@ -46,7 +46,14 @@ PIDFILE="${PIDFILE:-/tmp/parser.sh.pid}"
 trap 'rm -f "$PIDFILE"' EXIT
 trap 'exit 2' INT TERM QUIT HUP
 
-[ -f "$FILE" ] || logger_failure "Отсутствует файл \"${FILE}\"."
+logger_msg "Удаляем файл и скачиваем новые диапазоны IP по кодам стран"
+cp $FILE $TEMPFILE
+IFS=',' read -r -a country_codes <<< "$COUNTRIES"
+for code in "${country_codes[@]}"
+do
+  logger_msg "Скачиваем диапазоны для $code"
+  curl -s https://raw.githubusercontent.com/ipverse/rir-ip/master/country/$code/ipv4-aggregated.txt | grep -v '^#' >> $TEMPFILE
+done
 
 if ! ip address show dev "$IFACE" >/dev/null 2>&1; then
   logger_failure "Не удалось обнаружить интерфейс \"${IFACE}\"."
@@ -69,7 +76,7 @@ else
   logger_failure "Не удалось очистить таблицу маршрутизации #1000."
 fi
 
-logger_msg "Парсинг $(grep -c "" "$FILE") строк(-и) в файле \"${FILE}\"..."
+logger_msg "Парсинг $(grep -c "" "$TEMPFILE") строк(-и) в файле \"${TEMPFILE}\"..."
 
 while read -r line || [ -n "$line" ]; do
   [ -z "$line" ] && continue
@@ -85,8 +92,10 @@ while read -r line || [ -n "$line" ]; do
       logger_msg "Не удалось разрешить доменное имя: строка \"${line}\" проигнорирована."
     fi
   fi
-done < "$FILE"
+done < "$TEMPFILE"
 
 logger_msg "Парсинг завершен. #1000: $(ip route list table 1000 | wc -l)."
+
+rm $TEMPFILE
 
 exit 0

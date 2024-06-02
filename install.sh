@@ -56,7 +56,7 @@ fi
 msg "Выполняется установка keenetic-traffic-via-vpn..."
 
 INSTALL_DIR="/opt/etc/unblock"
-REPO_URL="https://raw.githubusercontent.com/rustrict/keenetic-traffic-via-vpn/main"
+REPO_URL="https://raw.githubusercontent.com/syrex92/keenetic-traffic-via-vpn/main"
 
 check_command opkg || failure "Для установки пакетов требуется opkg."
 opkg update >/dev/null 2>&1 || failure "Не удалось обновить список пакетов Entware."
@@ -101,6 +101,6 @@ if [ ! -f "${INSTALL_DIR}/unblock-list.txt" ]; then
 fi
 
 printf "%s\n" "---" "Установка завершена."
-msg "Не забудьте вписать название интерфейса VPN в файл config, а также заполнить файл unblock-list.txt."
+msg "Не забудьте вписать настройки в файл config."
 
 exit 0
